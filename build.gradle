@@ -5,16 +5,14 @@ plugins {
 	id 'java-gradle-plugin'
 }
 
-def thisPlugin =
+def plugin =
 		new GroovyScriptEngine(file('src/main/groovy').absolutePath, this.class.classLoader)
 				.loadScriptByName('io/enfuse/plugin/ChatGPTPlugin.groovy')
 
-apply plugin: thisPlugin
+apply plugin: plugin
 
 chatGPT {
 	path = "env.properties"
-//	codeDirectory = "./src/main/java/" // optional, this is default
-//	testDirectory = "./src/test/java"  // optional, this is default thoughts @Javin todo review
 }
 
 group = 'io.enfuse'
