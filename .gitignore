@@ -6,5 +6,6 @@
 
 build/
 out/
+lib/
 
 env.properties
