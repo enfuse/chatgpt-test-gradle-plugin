@@ -5,7 +5,9 @@ import groovy.json.StringEscapeUtils
 
 class ChatGPTService {
 
-    static String preparePrompt(String testCode, String mainCode, String error) {
+    public static String OPEN_AI_COMPLETIONS_ENDPOINT = "https://api.openai.com/v1/completions"
+
+    static String preparePrompt(String testCode, String sourceCode, String error) {
         return """I am a Test-Driven-Development coding assistant. I will be sent some test code, main code and a failure and will do my best to explain a possible solutions to fix the test failure (or exception).
 TEST CODE
 ------
@@ -13,7 +15,7 @@ $testCode
 ------
 MAIN CODE
 ------
-$mainCode
+$sourceCode
 ------
 ERROR
 ------
@@ -59,18 +61,13 @@ SOLUTION:"""
     }
 
     static URLConnection prepareRequest(String body, ChatGPTPluginConfiguration configuration) {
-        URLConnection postRequest = new URL("https://api.openai.com/v1/completions").openConnection()
-
-        postRequest.setRequestMethod("POST")
-        postRequest.setDoOutput(true)
-        postRequest.setRequestProperty("Content-Type", "application/json")
-        postRequest.setRequestProperty("Authorization", "Bearer ${configuration.getOpenAIKey()}")
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json")
+        headers.put("Authorization", "Bearer ${configuration.getOpenAIKey()}")
         if (configuration.getOpenAIOrganization() != null) {
-            postRequest.setRequestProperty("OpenAI-Organization", configuration.getOpenAIOrganization())
+            headers.put("OpenAI-Organization", configuration.getOpenAIOrganization())
         }
-        //todo intelliJ says better way?
-        postRequest.getOutputStream().write(body.getBytes("UTF-8"))
 
-        return postRequest
+        return WebRequestService.preparePostRequest(OPEN_AI_COMPLETIONS_ENDPOINT, body, headers)
     }
 }

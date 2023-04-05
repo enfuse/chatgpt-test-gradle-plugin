@@ -33,17 +33,6 @@ class ChatGPTPlugin implements Plugin<Project> {
         ChatGPTPluginExtension extension = project.getExtensions()
                 .create("chatGPT", ChatGPTPluginExtension.class)
 
-        project.task("hello", type: DefaultTask) {
-
-            doLast(task -> {
-                //color Proof of Concept
-                System.out.println("$ANSI_GREEN_BACKGROUND This text has a green background but default text! $ANSI_RESET")
-                System.out.println("$ANSI_RED This text has red text but a default background! $ANSI_RESET")
-                System.out.println("$ANSI_GREEN_BACKGROUND $ANSI_RED This text has a green background and red text! $ANSI_RESET")
-            })
-        }
-
-
         project.tasks.withType(Test).configureEach({ Test test ->
             ChatGPTPluginConfiguration configuration = validatePropsAndCreateConfiguration(extension) //todo throws exception, graceful failure?
             def listener = { TestDescriptor testDescriptor, TestResult testResult ->
@@ -111,11 +100,10 @@ class ChatGPTPlugin implements Plugin<Project> {
         if (openAIKey == null) {
             throw new GradleException("The [openAIKey] property is required. Please include it in your env.properties file")
         }
-        ChatGPTPluginConfiguration conf = new ChatGPTPluginConfiguration()
-        conf.setOpenAIKey(openAIKey)
-        conf.setOpenAIOrganization(props.getProperty("openAIOrganization", null))
-        conf.setModel(props.getProperty("model", "text-davinci-003"))
-        conf.setTemperature(Float.parseFloat(props.getProperty("temperature", "0")))
-        return conf
+
+        String openAIOrg = props.getProperty("openAIOrganization", null)
+        String model = props.getProperty("model", "text-davinci-003")
+        float temperature = Float.parseFloat(props.getProperty("temperature", "0"))
+        return new ChatGPTPluginConfiguration(openAIKey, openAIOrg, model, temperature)
     }
 }

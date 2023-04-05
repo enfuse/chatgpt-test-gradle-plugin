@@ -7,35 +7,26 @@ class ChatGPTPluginConfiguration {
     private String model
     private float temperature
 
-    String getOpenAIKey() {
-        return openAIKey
+    ChatGPTPluginConfiguration(String openAIKey, String openAIOrganization, String model, float temperature) {
+        this.openAIKey = openAIKey
+        this.openAIOrganization = openAIOrganization
+        this.model = model
+        this.temperature = temperature
     }
 
-    void setOpenAIKey(String openAIKey) {
-        this.openAIKey = openAIKey
+    String getOpenAIKey() {
+        return openAIKey
     }
 
     String getOpenAIOrganization() {
         return openAIOrganization
     }
 
-    void setOpenAIOrganization(String openAIOrganization) {
-        this.openAIOrganization = openAIOrganization
-    }
-
     String getModel() {
         return model
     }
 
-    void setModel(String model) {
-        this.model = model
-    }
-
     float getTemperature() {
         return temperature
-    }
-
-    void setTemperature(float temperature) {
-        this.temperature = temperature
     }
 }
