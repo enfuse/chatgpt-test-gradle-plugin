@@ -1,0 +1,35 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'java-gradle-plugin'
+}
+
+def thisPlugin =
+		new GroovyScriptEngine(file('src/main/groovy').absolutePath, this.class.classLoader)
+				.loadScriptByName('io/enfuse/plugin/ChatGPTPlugin.groovy')
+
+apply plugin: thisPlugin
+
+chatGPT {
+	path = "env.properties"
+//	codeDirectory = "./src/main/java/" // optional, this is default
+//	testDirectory = "./src/test/java"  // optional, this is default thoughts @Javin todo review
+}
+
+group = 'io.enfuse'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
