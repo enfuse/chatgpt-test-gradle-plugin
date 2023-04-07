@@ -2,8 +2,8 @@ package io.enfuse.plugin
 
 class WebRequestService {
 
-    static URLConnection preparePostRequest(String url, String body, Map<String, String> headers) {
-        URLConnection postRequest = new URL(url).openConnection()
+    static HttpURLConnection preparePostRequest(String url, String body, Map<String, String> headers) {
+        HttpURLConnection postRequest = (HttpURLConnection)new URL(url).openConnection()
 
         postRequest.setRequestMethod("POST")
         postRequest.setDoOutput(true)

@@ -6,11 +6,11 @@ import spock.lang.Specification
 class WebRequestServiceTest extends Specification {
     void testPreparePostRequest() {
         when:
-        Map<String, String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>()
         headers.put("Content-Type", "application/json")
         headers.put("Authorization", "Bearer sk-XXXXX")
 
-        URLConnection response = WebRequestService.preparePostRequest("https://postman-echo.com/post", '{"key":"value"}', headers)
+        HttpURLConnection response = WebRequestService.preparePostRequest("https://postman-echo.com/post", '{"key":"value"}', headers)
 
         then:
         response.getOutputStream().toString() == '{"key":"value"}'

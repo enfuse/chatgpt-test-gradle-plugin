@@ -8,12 +8,12 @@ class ChatGPTService {
     public static String OPEN_AI_COMPLETIONS_ENDPOINT = "https://api.openai.com/v1/completions"
 
     static String preparePrompt(String testCode, String sourceCode, String error) {
-        return """I am a Test-Driven-Development coding assistant. I will be sent some test code, main code and a failure and will do my best to explain a possible solutions to fix the test failure (or exception).
+        return """I am a Test-Driven-Development coding assistant. I will be sent some test code, source code and a failure and will do my best to explain a possible solutions to fix the test failure (or exception).
 TEST CODE
 ------
 $testCode
 ------
-MAIN CODE
+SOURCE CODE
 ------
 $sourceCode
 ------
@@ -27,14 +27,32 @@ SOLUTION:"""
     static MessageResponse callChatGPTCompletion(String prompt, ChatGPTPluginConfiguration configuration) {
         prompt = sanitizePrompt(prompt)
         String body = prepareJSONRequest(prompt, configuration)
-//        println(body)
 
-        URLConnection request = prepareRequest(body, configuration)
+        HttpURLConnection request = prepareRequest(body, configuration)
 
         return processResponseAndReturn(request)
     }
+    static String sanitizePrompt(String prompt) {
+        return StringEscapeUtils.escapeJava(prompt)
+    }
 
-    private static MessageResponse processResponseAndReturn(URLConnection request) {
+    static String prepareJSONRequest(String prompt, ChatGPTPluginConfiguration configuration) {
+        return """{"model":"${configuration.getModel()}","prompt":"$prompt","temperature":${configuration.getTemperature()},"max_tokens":2000}"""
+        // TODO: make max tokens (max minus prompt tokens count)
+    }
+
+    static HttpURLConnection prepareRequest(String body, ChatGPTPluginConfiguration configuration) {
+        Map<String, String> headers = new HashMap<>()
+        headers.put("Content-Type", "application/json")
+        headers.put("Authorization", "Bearer ${configuration.getOpenAIKey()}")
+        if (configuration.getOpenAIOrganization() != null) {
+            headers.put("OpenAI-Organization", configuration.getOpenAIOrganization())
+        }
+
+        return WebRequestService.preparePostRequest(OPEN_AI_COMPLETIONS_ENDPOINT, body, headers)
+    }
+
+    static MessageResponse processResponseAndReturn(HttpURLConnection request) {
         JsonSlurper jsonSlurper = new JsonSlurper()
         int responseCode = request.getResponseCode()
         def response = responseCode == 200 ? jsonSlurper.parseText(request.getInputStream().getText()) : jsonSlurper.parseText(request.getErrorStream().getText())
@@ -51,23 +69,4 @@ SOLUTION:"""
         return new MessageResponse(true, response.choices[0].text.trim())
     }
 
-    static String sanitizePrompt(String prompt) {
-        return StringEscapeUtils.escapeJava(prompt)
-    }
-
-    static String prepareJSONRequest(String prompt, ChatGPTPluginConfiguration configuration) {
-        return """{"model":"${configuration.getModel()}","prompt":"$prompt","temperature":${configuration.getTemperature()},"max_tokens":2000}"""
-        // TODO: make max tokens (max minus prompt tokens count)
-    }
-
-    static URLConnection prepareRequest(String body, ChatGPTPluginConfiguration configuration) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json")
-        headers.put("Authorization", "Bearer ${configuration.getOpenAIKey()}")
-        if (configuration.getOpenAIOrganization() != null) {
-            headers.put("OpenAI-Organization", configuration.getOpenAIOrganization())
-        }
-
-        return WebRequestService.preparePostRequest(OPEN_AI_COMPLETIONS_ENDPOINT, body, headers)
-    }
 }

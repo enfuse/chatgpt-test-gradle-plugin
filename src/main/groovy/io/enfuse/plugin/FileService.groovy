@@ -8,9 +8,12 @@ class FileService {
     static MessageResponse getTestCode(TestDescriptor testDescriptor, String path) {
         String testClassName = getTestClassName(testDescriptor)
         List<FoundFile> files = getAllFilePaths(path)
-        FoundFile testFileName = findClosestMatch(files, testClassName)
+        FoundFile testFile = findClosestMatch(files, testClassName)
 
-        File foundFile = new File(testFileName.getPath())
+        if (testFile == null) {
+            return new MessageResponse(false, "Failed to find test code class matching [" + testClassName + "] at path [" + path + "].")
+        }
+        File foundFile = new File(testFile.getPath())
         foundFile.newReader()
         try (BufferedReader reader = foundFile.newReader()) {
             return getMethodCode(reader, testDescriptor.getDisplayName())
@@ -22,13 +25,12 @@ class FileService {
     static MessageResponse getClassCode(TestDescriptor testDescriptor, String path) {
         String testClassName = getTestClassName(testDescriptor)
         List<FoundFile> files = getAllFilePaths(path)
-        FoundFile sourceFileName = findClosestMatch(files, testClassName)
+        FoundFile sourceFile = findClosestMatch(files, testClassName)
 
-        println('Found the source code file with path' + sourceFileName.getPath())
-        File foundFile = new File(sourceFileName.getPath())
-        if (foundFile == null) {
-            return new MessageResponse(false, "Failed to find class file with name [" + sourceFileName + "].")
+        if (sourceFile == null) {
+            return new MessageResponse(false, "Failed to find source code class matching [" + testClassName + "] at path [" + path + "].")
         }
+        File foundFile = new File(sourceFile.getPath())
 
         foundFile.newReader()
         try (BufferedReader reader = foundFile.newReader()) {
@@ -39,25 +41,8 @@ class FileService {
         }
     }
 
-    protected static String getTestClassName(TestDescriptor testDescriptor) {
+    static String getTestClassName(TestDescriptor testDescriptor) {
         return testDescriptor.getClassName().substring(testDescriptor.getClassName().lastIndexOf('.') + 1)
-    }
-
-    private static File find(String path, String fileName) {
-        File file = new File(path)
-        if (fileName.equalsIgnoreCase(file.getName())) {
-            return file
-        }
-        if (file.isDirectory()) {
-            for (String childFile : file.list()) {
-                File innerFile = find(String.format("%s/%s", path, childFile), fileName)
-
-                if (innerFile != null) {
-                    return innerFile
-                }
-            }
-        }
-        return null
     }
 
     private static MessageResponse getMethodCode(BufferedReader reader, String targetMethod) throws IOException {
