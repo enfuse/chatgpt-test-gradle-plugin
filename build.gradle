@@ -3,19 +3,8 @@ plugins {
 	id 'groovy'
 }
 
-def plugin =
-		new GroovyScriptEngine(file('src/main/groovy').absolutePath, this.class.classLoader)
-				.loadScriptByName('io/enfuse/plugin/ChatGPTPlugin.groovy')
-
-apply plugin: plugin
-
-chatGPT {
-	path = "env.properties"
-}
-
 group = 'io.enfuse.plugin'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 17
 
 repositories {
 	mavenCentral()
