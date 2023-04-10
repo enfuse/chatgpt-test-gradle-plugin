@@ -1,10 +1,11 @@
 plugins {
 	id 'java-gradle-plugin'
 	id 'groovy'
+	id 'com.gradle.plugin-publish' version '1.2.0'
 }
 
 group = 'io.enfuse.plugin'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2'
 
 repositories {
 	mavenCentral()
@@ -18,4 +19,17 @@ dependencies {
 
 tasks.withType(Test).configureEach {
 	useJUnitPlatform()
+}
+gradlePlugin {
+	website = 'https://github.com/enfuse/chatgpt-test-gradle-plugin'
+	vcsUrl = 'https://github.com/enfuse/chatgpt-test-gradle-plugin'
+	plugins {
+		ChatGPTPlugin {
+			id = 'io.enfuse.ChatGPTPlugin'
+			displayName = 'Plugin that leverages ChatGPT for test failure resolution'
+			description = 'Leverage ChatGPT to enable quicker test failure resolution'
+			tags.set(['chatGPT', 'testing', 'openai', 'TDD'])
+			implementationClass = 'io.enfuse.plugin.ChatGPTPlugin'
+		}
+	}
 }
