@@ -1,6 +1,6 @@
 package io.enfuse.plugin
 
-import org.gradle.api.DefaultTask
+
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -39,7 +39,7 @@ class ChatGPTPlugin implements Plugin<Project> {
                 if (testResult.getResultType() != TestResult.ResultType.FAILURE) {
                     return
                 }
-                println '~~~~~~~~~~~~~~~~~~START~~~~~~~~~~~~~~'
+                println()
                 print('    ')
                 System.out.println("${FileService.getTestClassName(testDescriptor)} > ${testDescriptor.getDisplayName()}$ANSI_RED FAILED $ANSI_RESET")
                 String error = getParsedErrorFromException(testResult.getException())
@@ -49,27 +49,21 @@ class ChatGPTPlugin implements Plugin<Project> {
                 MessageResponse classCodeResponse = FileService.getClassCode(testDescriptor, extension.getCodeDirectory())
                 if (!classCodeResponse.isSuccess()) {
                     println(ANSI_RED + classCodeResponse.getMessage() + ANSI_RESET)
-                    println '~~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~'
-
                     return
                 }
                 MessageResponse testCodeResponse = FileService.getTestCode(testDescriptor, extension.getTestDirectory())
                 if (!testCodeResponse.isSuccess()) {
                     println(ANSI_RED + classCodeResponse.getMessage() + ANSI_RESET)
-                    println '~~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~'
-
                     return
                 }
                 String classCode = classCodeResponse.getMessage()
                 String testCode = testCodeResponse.getMessage()
 
                 String prompt = ChatGPTService.preparePrompt(testCode, classCode, error)
-                println("Calling ${ANSI_GREEN}ChatGPT${ANSI_RESET} for test resolution")
+                println("Calling ${ANSI_GREEN}ChatGPT${ANSI_RESET} for test resolution:")
                 MessageResponse response = ChatGPTService.callChatGPTCompletion(prompt, configuration)
 
                 println((response.isSuccess() ? ANSI_GREEN : ANSI_RED) + response.getMessage() + ANSI_RESET)
-
-                println '~~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~'
             }
             test.testLogging.lifecycle.events = []
             test.afterTest(listener)
@@ -98,7 +92,7 @@ class ChatGPTPlugin implements Plugin<Project> {
         props.load(new File(extension.getPath()).newReader())
         String openAIKey = props.getProperty("openAIKey")
         if (openAIKey == null) {
-            throw new GradleException("The [openAIKey] property is required. Please include it in your env.properties file")
+            throw new GradleException("The [openAIKey] property is required. Please include it in your ${extension.getPath()} file. File path can be specified in your build.gradle under the chatGPT block.")
         }
 
         String openAIOrg = props.getProperty("openAIOrganization", null)
