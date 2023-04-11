@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.enfuse.plugin'
-version = '0.0.3'
+version = '0.0.4'
 
 repositories {
 	mavenCentral()
@@ -26,8 +26,8 @@ gradlePlugin {
 	plugins {
 		ChatGPTPlugin {
 			id = 'io.enfuse.ChatGPTPlugin'
-			displayName = 'Plugin that leverages ChatGPT for test failure resolution'
-			description = 'Leverage ChatGPT to enable quicker test failure resolution'
+			displayName = 'ChatGPT Testing Plugin'
+			description = 'Automatically pipe test failures to ChatGPT for to enable quicker resolution of failures. Supports groovy, java, kotlin and more. Simply include the plugin, add your openAIKey, run gradle test and watch ChatGPT debug your test failures!'
 			tags.set(['chatGPT', 'testing', 'openai', 'TDD', 'ai'])
 			implementationClass = 'io.enfuse.plugin.ChatGPTPlugin'
 		}

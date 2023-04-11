@@ -6,13 +6,13 @@ You can find this plugin on [gradle here](https://plugins.gradle.org/plugin/io.e
 ## Usage
 
 1. Include the plugin in your build.gradle
-Using the plugins DSL:
+Using the [plugins DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block):
 ```groovy
 plugins {
   id "io.enfuse.ChatGPTPlugin" version "X.Y.Z"
 }
 ```
-Using legacy plugin application:
+Using [legacy plugin application](https://docs.gradle.org/current/userguide/plugins.html#sec:old_plugin_application):
 ```groovy
 buildscript {
   repositories {
@@ -50,22 +50,22 @@ chatGPT {
 ```
 
 5. run `./gradlew test` and see the output:
+![screenshot of terminal logs](./docs/assets/Logs-Screenshot-v0.0.3.png)
 ```
- $ ./gradlew test
+$  ./gradlew test
 
 > Task :test
-    GreetingControllerIntegrationTest > post_saves() FAILED
-java.lang.AssertionError: JSON path "$.content" expected:<This is my content> but was:<null>
-    Calling ChatGPT for test resolution:
-The error is indicating that the content value is null when it should be "This is my content". This could be due to an issue with the GreetingInfo constructor, which is currently set to accept a null value for the content parameter. To fix this, the constructor should be updated to require a non-null value for the content parameter. Additionally, the post mapping in the GreetingControllerIntegration class should be updated to ensure that the request body is not null before attempting to save it.
-    
-    GreetingServiceTest > save_shouldSaveCandidate() FAILED
+
+    GreetingServiceTest > save_shouldSaveCandidate() FAILED 
 org.opentest4j.AssertionFailedError: expected: <this is amazing content> but was: <null>
     Calling ChatGPT for test resolution:
-The test code is expecting the response from the save() method to have a content value of "this is amazing content", however, the main code is not setting the content value of the GreetingRecord object. To fix this, the content value should be set in the main code before the GreetingRecord object is saved. This can be done by adding the following line of code to the save() method:
+The test code is expecting the response from the save() method to have a content value of "this is amazing content", however, the source code is not setting the content value of the GreetingRecord object. To fix this, the content value should be set in the source code before the GreetingRecord object is saved. This can be done by adding the following line of code to the save() method:
+
 record.setContent(request.getContent());
 
-16 tests completed, 2 failed
+16 tests completed, 1 failed
+
+> Task :test FAILED
 ```
 
 ## Contributing
